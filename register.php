@@ -1,23 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration</title>
+</head>
+<body>
+    <h2>Login Form</h2>
+    <form method="POST" action="">
+
+        <label>Username:</label>
+        <input type="text" name="username" required><br><br>
+
+        <label>Password:</label>
+        <input type="password" name="password" required><br><br>
+        
+        <input type='hidden' name='action' value='create' />
+        <input type="submit" value="Log In">
+    </form>
+</body>
+</html>
 <?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    require_once 'db_connect.php'; // include database connection file
+session_start();
+if (isset($_POST['action'])) 
+    $action = $_POST['action']; 
+else
+    $action = ""; 
 
-    // Retrieve form data
-    $forename = $_POST[''];
-    $surname = $_POST['surname'];
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+if ($action == 'create') {
+$un_temp = $_POST['username'];
+$pw_temp = $_POST['password'];
+$_SESSION["username"] = $un_temp;
+require_once "db_connect.php";
 
-    // Hash the password
-    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-    // Insert user data into the database
-    $stmt = $conn->prepare("INSERT INTO users (forename, surname, username, password) VALUES (?, ?, ?, ?)");
-    $stmt->bind_param("ssss", $forename, $surname, $username, $hashedPassword);
-    $stmt->execute();
-
-    // Redirect to login page or display a success message
-    header("Location: authenticate.php");
-    exit();
+$stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+$stmt->bind_param('s', $un_temp);
+$stmt->execute();
+$result = $stmt->get_result(); 
+if (!$result) {
+        die("User not found");
+    } elseif ($result->num_rows) {
+        $row = $result->fetch_array(MYSQLI_NUM);
+        $result->close();
+        if (password_verify($pw_temp, $row[3])) {
+            $_SESSION["forename"] = $row[0];
+            $_SESSION["surname"] = $row[1];
+            echo htmlspecialchars("$row[0] $row[1] :
+Hi $row[0], you are now logged in as '$row[2]'");
+            die("<p><a href='continue.php'>Click here to continue</a></p>");
+        } else {
+            die("Invalid username/password combination");
+        }
+    } else {
+        die("Invalid username/password combination");
+    } 
 }
 ?>
