@@ -40,7 +40,7 @@ if (!$result) {
     } elseif ($result->num_rows) {
         $row = $result->fetch_array(MYSQLI_NUM);
         $result->close();
-        if (password_verify($pw_temp, $row[3])) {
+        if (password_verify($pw_temp, $row[3])) { // Check if the password is correct
             $_SESSION["forename"] = $row[0];
             $_SESSION["surname"] = $row[1];
             echo htmlspecialchars("$row[0] $row[1] :
