@@ -31,7 +31,7 @@ $pw_temp = $_POST['password'];
 $_SESSION["username"] = $un_temp;
 require_once "db_connect.php";
 
-$stmt = $conn->prepare("SELECT * FROM users WHERE username = ?");
+$stmt = $conn->prepare("SELECT * FROM login_info WHERE username = ?");
 $stmt->bind_param('s', $un_temp);
 $stmt->execute();
 $result = $stmt->get_result(); 
