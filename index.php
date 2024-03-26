@@ -51,7 +51,7 @@
             <!-- 按钮组合 -->
             <div class="button-container">
                 <div>
-                    <button class="role-button" onclick="location.href='volunteer.html'">
+                    <button class="role-button" onclick="location.href='sign_V.php'">
                         <img src="volunteer.jpg" alt="Volunteer">
                         <div class="role-description">捐赠食物</div>
                     </button>
@@ -63,7 +63,7 @@
                     </button>
                 </div>
                 <div>
-                    <button class="role-button" onclick="location.href='charity.html'">
+                    <button class="role-button" onclick="location.href='sign_C.php'">
                         <img src="charity.jpg" alt="Charity">
                         <div class="role-description">加入10元，资助有需要人士一餐饭</div>
                     </button>
