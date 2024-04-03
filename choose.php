@@ -184,51 +184,54 @@ $dateObject->modify('-1 month');
             <th>六</th>
         </tr>
     
-    <script>
+ <script>
         // 用于保存选中的日历日期和表格数据的对象
         var selectedData = {
-            date: null,
+            dates: [],
             items: []
         };
 
         // 日历日期的复选框点击处理
-        function selectDate(dayElement, day) {
-            // 取消之前选中的日期
-            if (selectedData.date) {
-                selectedData.date.element.checked = false;
+        function selectDate(checkbox, day) {
+            if (checkbox.checked) {
+                selectedData.dates.push(day);
+            } else {
+                selectedData.dates = selectedData.dates.filter(date => date !== day);
             }
-            // 保存新选中的日期
-            selectedData.date = {element: dayElement, day: day};
         }
 
         // 表格条目的复选框点击处理
-        function selectItem(itemElement, charName) {
-            if (itemElement.checked) {
-                // 添加到选中列表
-                selectedData.items.push(charName);
+        function selectItem(checkbox, itemName) {
+            if (checkbox.checked) {
+                selectedData.items.push(itemName);
             } else {
-                // 从选中列表移除
-                var index = selectedData.items.indexOf(charName);
-                if (index > -1) {
-                    selectedData.items.splice(index, 1);
-                }
+                selectedData.items = selectedData.items.filter(item => item !== itemName);
             }
         }
 
-        // 提交选中数据的函数
-        function submitSelection() {
-            // 检查是否有日期和条目被选中
-            if (selectedData.date && selectedData.items.length > 0) {
-                console.log("选中日期：", selectedData.date.day);
-                console.log("选中条目：", selectedData.items);
-                // 这里可以添加代码将选中数据发送到服务器
-                // 例如使用 AJAX 请求
-            } else {
-                alert("请选择日期和至少一个条目。");
-            }
+        // 处理选中数据并显示在日历上
+        function handleSelection() {
+            // 清空之前的选中项
+            var checkboxes = document.querySelectorAll('.calendar .item-checkbox');
+            checkboxes.forEach(function(checkbox) {
+                checkbox.parentNode.removeChild(checkbox);
+            });
+
+            // 遍历所有选中的日期
+            selectedData.dates.forEach(function(day) {
+                // 在这一天的单元格中添加选中的项
+                var dayCell = document.querySelector('.calendar td[data-day="' + day + '"]');
+                if (dayCell) {
+                    selectedData.items.forEach(function(item) {
+                        var itemElement = document.createElement('span');
+                        itemElement.classList.add('item-checkbox');
+                        itemElement.textContent = item;
+                        dayCell.appendChild(itemElement);
+                    });
+                }
+            });
         }
     </script>
-    
         <!-- 日历的天数部分 -->
         <?php
         echo '<tr>';
