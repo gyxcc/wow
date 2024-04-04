@@ -1,0 +1,87 @@
+<?php
+require_once 'db_connect.php';
+
+function get_post($conn, $var)
+{
+    return $conn->real_escape_string($_POST[$var]);
+}
+
+if (isset($_POST['User_id']) &&
+    isset($_POST['Char_Name']) &&
+    isset($_POST['Location']) &&
+    isset($_POST['Head_name']) &&
+    isset($_POST['Head_Contact_num']) &&
+    isset($_POST['Head_identity_id']) &&
+    isset($_POST['password'])){
+//将表单数据储存在charity数据库中
+    $User_id = get_post($conn, 'User_id');
+    $Char_Name = get_post($conn, 'Char_Name');
+    $Location = get_post($conn, 'Location');
+    $Head_name = get_post($conn, 'Head_name');
+    $Head_Contact_num = get_post($conn, 'Head_Contact_num');
+    $Head_identity_id = get_post($conn, 'Head_identity_id'); 
+    $Password = get_post($conn, 'password');// Assuming you're receiving this from the form 
+//将表单数据存储在login数据库中
+    $query = "INSERT INTO classics (User_id, Char_Name, Location, Head_name, Head_Contact_num, Head_identity_id) VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("ssssss", $User_id, $Char_Name, $Location, $Head_name, $Head_Contact_num, $Head_identity_id);
+    if ($stmt->execute()) {
+        echo "Record inserted successfully!<br><br>";
+    } else {
+        echo "INSERT failed: $query<br>" . $stmt->error . "<br><br>";
+    }
+    $stmt->close();
+}
+//将表单数据存储在login数据库中
+    $loginQuery = "INSERT INTO login (user_id, password) VALUES (?, ?)";
+    $loginStmt = $conn->prepare($loginQuery);
+    $loginStmt->bind_param("ss", $User_id, $Password);
+    if ($loginStmt->execute()) {
+        echo "Record inserted into login successfully!<br><br>";
+    } else {
+        echo "INSERT into login failed: $loginQuery<br>" . $loginStmt->error . "<br><br>";
+    }
+    
+    $loginStmt->close();
+if (empty($Password)) {
+    echo "Password field is empty. Please enter a password.<br><br>";
+    exit;
+}
+
+
+// 下面是表单HTML
+echo <<<_END
+<form action="sign_S.php" method="post">
+<pre>
+User_id <input type="text" name="User_id">
+Char_Name <input type="text" name="Char_Name">
+Location <input type="text" name="Location">
+Head_name <input type="text" name="Head_name">
+Head_Contact_num <input type="text" name="Head_Contact_num">
+Head_identity_id <input type="text" name="Head_identity_id"> 
+User_id<input type="text" name="User_id">
+Password <input type= "text" name="password">
+   
+   <!-- New field added -->
+<input type="submit" value="ADD RECORD">
+</pre>
+</form>
+<form action="register.php" method="POST">
+    <p>Already have an account? Click <input type="submit" value="Login"></p>
+</form>
+_END;
+
+// 下面是获取并显示数据库中记录的逻辑
+$query = "SELECT * FROM charity";
+$result = $conn->query($query);
+
+if (!$result) {
+    die("Database access failed: " . $conn->error);
+}
+
+$rows = $result->num_rows;
+
+
+$result->close();
+$conn->close();
+?>
