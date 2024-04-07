@@ -40,7 +40,7 @@ if (!$result) {
     } elseif ($result->num_rows) {
         $row = $result->fetch_array(MYSQLI_NUM);
         $result->close();
-        if (password_varify("password", $pw_temp)) {
+        if (password_verify("password", $pw_temp)) {
             $_SESSION["user_id"] = $row[0];
             $_SESSION["username"] = $row[1];
             $stmt_1 = "SELECT Char_name from charity where User_id = $row[0];";
