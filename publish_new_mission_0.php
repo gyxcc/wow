@@ -1,14 +1,20 @@
 <?php
 // 启动会话
 session_start();
-$_SESSION['Char_Name']= $_POST['Char_Name'];
-$_SESSION['Char_location'] = $_POST['Location'];
+
+if (isset($_SESSION['Char_Name'])){} 
+else{
+$_SESSION['Char_Name'] = $_POST['Cha_name'];}
+
+if (isset($_SESSION['Char_location'])){}
+else{
+$_SESSION['Char_location'] = $_POST['Location'];}
 // 初始化或清空选中项
 if (!isset($_POST['foodButton']) && !isset($_POST['medicineButton'])) {
     $_SESSION['selectedFood'] = [];
     $_SESSION['selectedMedicine'] = [];
 }
-// 数据库连接（请根据实际情况替换 'db_connect.php'）
+
 require_once 'db_connect.php';
 
 // 处理表单提交
@@ -75,7 +81,7 @@ $selectedItems = array_merge($_SESSION['selectedFood'], $_SESSION['selectedMedic
       <tbody>
           <?php
           require_once 'db_connect.php';
-          $query = "SELECT Medicine_id, Medicine_type, Medicine_status, Expiration_date, Amount FROM medicine WEHRE Medicine_status = 'new';";
+          $query = "SELECT Medicine_id, Medicine_type, Medicine_status, Expiration_date, Amount FROM medicine WHERE Medicine_status = 'new';";
           $result_0 = $conn->query($query);
           while ($row = $result_0->fetch_assoc()):?>
             <tr>
@@ -95,7 +101,7 @@ $selectedItems = array_merge($_SESSION['selectedFood'], $_SESSION['selectedMedic
     <input type="submit" name="actionButton" value="submit">
   </form>
  <?php
-  session_start();
+
 
   // 检查食物按钮的点击
   if (isset($_POST['foodButton'])) {
@@ -125,10 +131,11 @@ $selectedItems = array_merge($_SESSION['selectedFood'], $_SESSION['selectedMedic
       $Mission_status = "not accepted";
       $stmt_0 = $conn->prepare("INSERT INTO mission_store_to_cha(Date, Store_available_start_time, Store_available_end_time, Mission_status, Char_location) VALUES(?,?,?,?)");
       $stmt_0->bind_param("sssss", $Date, $Store_available_start_time, $Store_available_end_time, $Mission_status, $Char_location);
-      $stmt->execute();
+      $stmt_0->execute();
       $stmt_1 = $conn->prepare("SELECT Mission_id FROM mission_store_to_cha WHERE Date = ? AND Char_location = ? AND Mission_status = ?");
       $stmt_1->bind_param('sss', $Date, $Char_location,$Mission_status);
-      $result =$stmt_1->execute();
+      $stmt_1->execute();
+      $result = $stmt_1->get_result();
       $row = $result->fetch_array(MYSQLI_NUM);  
       // 执行操作
       foreach ($selectedFood as $foodId) {
@@ -153,8 +160,20 @@ $selectedItems = array_merge($_SESSION['selectedFood'], $_SESSION['selectedMedic
         }
         unset($_SESSION['selectedMedicine']);
     }                                                                                                                            
-  }
-  ?>
+  }?>
+  <?php if (!empty($selectedItems)): ?>
+    <h3>Selected Items:</h3>
+    <ul>
+        <?php 
+        foreach ($_SESSION['selectedFood'] as $foodId) {
+            echo "<li>Food ID: " . htmlspecialchars($foodId) . "</li>";
+        }
+        foreach ($_SESSION['selectedMedicine'] as $medicineId) {
+            echo "<li>Medicine ID: " . htmlspecialchars($medicineId) . "</li>";
+        }
+        ?>
+    </ul>
+  <?php endif; ?>
           <h2>Publish New Missions</h2>
     <form method="POST" action="">
 
